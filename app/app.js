@@ -1,7 +1,17 @@
 const form = document.getElementById('form');
 const texto = document.getElementById('texto');
 const lista = document.getElementById('lista');
-let tareas = JSON.parse(localStorage.getItem('tareas') || '[]');
+
+function cargarTareas() {
+  try {
+    const datos = JSON.parse(localStorage.getItem('tareas') || '[]');
+    return Array.isArray(datos) ? datos : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+let tareas = cargarTareas();
 
 function render() {
   lista.innerHTML = '';
@@ -21,9 +31,17 @@ function guardar() {
   render();
 }
 
+texto.oninput = () => texto.setCustomValidity('');
+
 form.onsubmit = e => {
   e.preventDefault();
-  tareas.push(texto.value);
+  const valor = texto.value.trim();
+  if (valor === '') {
+    texto.setCustomValidity('Escribe una tarea (no solo espacios).');
+    texto.reportValidity();
+    return;
+  }
+  tareas.push(valor);
   texto.value = '';
   guardar();
 };
